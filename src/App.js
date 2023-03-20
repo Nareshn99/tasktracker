@@ -1,24 +1,51 @@
-import logo from './logo.svg';
 import './App.css';
+import { useState, useEffect, useRef } from 'react';
+import { uploadFile } from './api';
+
+
 
 function App() {
+
+  const [file, setFile] = useState('');
+  const [result, setResult] = useState('');
+  const fileInputRef = useRef()
+
+  useEffect(() => {
+    const getImage = async () => {
+      if (file) {
+        const data = new FormData();
+        data.append("name", file.name);
+        data.append("file", file);
+
+        const response = await uploadFile(data);
+        console.log(response.path)
+        setResult(response.path);
+      }
+    }
+    getImage();
+  }, [file])
+
+  const onUploadClick = () => {
+    fileInputRef.current.click();
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+    <div className='headerfor'>Simple file sharing App!</div>
+      <div className="wrapper">
+        <h1>Share Your File In OneStep😎</h1>
+        <p>Upload and share the download link.</p>
+
+        <button onClick={() => onUploadClick()}>Upload</button>
+        <input
+          type="file"
+          ref={fileInputRef}
+          style={{ display: "none" }}
+          onChange={(e) => setFile(e.target.files[0])}
+        />
+        <a href={result} target='_blank' rel="noreferrer">{result}</a>
+      </div>
+    </>
   );
 }
 
